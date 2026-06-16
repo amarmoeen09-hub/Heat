@@ -408,8 +408,18 @@ function buildAreas(){
 }
 
 async function getJSON(url){
-  const r = await fetch(url);
-  if(!r.ok) throw new Error("network");
+  let r;
+  try{
+    r = await fetch(url);
+  }catch(netErr){
+    // network/CORS/DNS failure — fetch rejects before any response
+    throw new Error("Could not reach "+new URL(url).host+" ("+netErr.message+")");
+  }
+  if(!r.ok){
+    let detail="";
+    try{ const j=await r.json(); if(j&&j.reason) detail=" — "+j.reason; }catch(_){}
+    throw new Error("HTTP "+r.status+" from "+new URL(url).host+detail);
+  }
   return r.json();
 }
 
@@ -573,9 +583,10 @@ async function loadYoY(){
     renderCells(last);
   }catch(e){
     console.error("YoY archive failed:",e);
-    // Still show today's numbers instead of wiping the whole panel.
+    // Still show today's numbers instead of wiping the whole panel,
+    // and surface the real reason so it can be diagnosed on-screen.
     renderCells({max:null,min:null,mean:null,rain:null,wind:null},
-      `Last-year archive is temporarily unavailable — showing today's readings only.`);
+      `Last-year archive unavailable (${e.message}). Showing today's readings only.`);
   }
 }
 
@@ -637,7 +648,8 @@ async function loadTrend(){
           y:{grid:{color:grid},ticks:{color:muted,callback:v=>v+"°",font:{size:11}}}}}
     });
   }catch(e){
-    $("#trend-stats").innerHTML=`<div class="err">Long-term archive unavailable.</div>`;
+    console.error("Trend archive failed:",e);
+    $("#trend-stats").innerHTML=`<div class="err">Long-term archive unavailable (${e.message}).</div>`;
   }
 }
 
