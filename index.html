@@ -502,41 +502,80 @@ async function loadYoY(){
   const {lat,lon}=area;
   const now=new Date();
   const y=now.getFullYear()-1;
-  const date=`${y}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-  $("#yoy").innerHTML=Array(4).fill('<div class="card cell"><div class="lab skel">load</div><div class="now skel">00</div></div>').join("");
-  const url=`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${date}&end_date=${date}`+
-    `&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,wind_speed_10m_max&timezone=auto`;
-  try{
-    const a=await getJSON(url);
-    const last={
-      max:a.daily.temperature_2m_max[0], min:a.daily.temperature_2m_min[0],
-      mean:a.daily.temperature_2m_mean[0], rain:a.daily.precipitation_sum[0], wind:a.daily.wind_speed_10m_max[0]
-    };
-    // current comparable values captured from the live forecast
-    const f=window.__today||{};
-    const nowMean=(f.hi!=null&&f.lo!=null)?(f.hi+f.lo)/2:null;
+  const fmt=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  // Same date last year, but request a ±3-day window so a single gap in the
+  // ERA5 archive doesn't break the whole comparison.
+  const target=new Date(now); target.setFullYear(y);
+  const targetStr=fmt(target);
+  const startD=new Date(target); startD.setDate(startD.getDate()-3);
+  const endD=new Date(target);   endD.setDate(endD.getDate()+3);
+
+  // current comparable values captured from the live forecast
+  const f=window.__today||{};
+  const nowMean=(f.hi!=null&&f.lo!=null)?(f.hi+f.lo)/2:null;
+
+  const renderCells=(last,note)=>{
     const cells=[
       ["Daytime high","°C",f.hi??null,last.max,1],
       ["Overnight low","°C",f.lo??null,last.min,1],
       ["Mean temp","°C",nowMean,last.mean,1],
       ["Peak wind","km/h",f.wind??null,last.wind,0],
     ];
-    $("#yoy").innerHTML=cells.map(c=>{
+    const html=cells.map(c=>{
       const [lab,unit,nowV,thenV,dec]=c;
+      const u=unit==="°C"?"°":` ${unit}`;
       if(nowV==null) return `<div class="card cell"><div class="lab">${lab}</div><div class="vals"><span class="now">—</span></div></div>`;
+      if(thenV==null) return `<div class="card cell"><div class="lab">${lab}</div>
+        <div class="vals"><span class="now num">${round(nowV,dec)}${u}</span>
+          <span class="then">no ${y} record</span></div></div>`;
       const diff=nowV-thenV;
       const cls=Math.abs(diff)<(dec?0.05:0.5)?"flat":(diff>0?"up":"down");
       const arr=cls==="up"?I.up:cls==="down"?I.down:"";
       const sign=diff>0?"+":"";
       return `<div class="card cell">
         <div class="lab">${lab}</div>
-        <div class="vals"><span class="now num">${round(nowV,dec)}${unit==="°C"?"°":""}</span>
-          <span class="then num">was ${round(thenV,dec)}${unit==="°C"?"°":""} in ${y}</span></div>
+        <div class="vals"><span class="now num">${round(nowV,dec)}${u}</span>
+          <span class="then num">was ${round(thenV,dec)}${u} in ${y}</span></div>
         <div class="chg ${cls}">${arr}${sign}${round(diff,dec)} ${unit}</div>
       </div>`;
     }).join("");
+    $("#yoy").innerHTML=(note?`<div class="err" style="grid-column:1/-1">${note}</div>`:"")+html;
+  };
+
+  $("#yoy").innerHTML=Array(4).fill('<div class="card cell"><div class="lab skel">load</div><div class="now skel">00</div></div>').join("");
+  const url=`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${fmt(startD)}&end_date=${fmt(endD)}`+
+    `&daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,wind_speed_10m_max&timezone=auto`;
+  try{
+    const a=await getJSON(url);
+    const times=(a.daily&&a.daily.time)||[];
+    // index of the exact target date, else the middle of the window
+    let ti=times.indexOf(targetStr);
+    if(ti<0) ti=Math.floor(times.length/2);
+    // value at the target day, falling back to the nearest non-null day
+    const pick=arr=>{
+      if(!arr) return null;
+      if(arr[ti]!=null) return arr[ti];
+      for(let off=1;off<arr.length;off++){
+        if(arr[ti-off]!=null) return arr[ti-off];
+        if(arr[ti+off]!=null) return arr[ti+off];
+      }
+      return null;
+    };
+    const last={
+      max:pick(a.daily.temperature_2m_max),
+      min:pick(a.daily.temperature_2m_min),
+      mean:pick(a.daily.temperature_2m_mean),
+      rain:pick(a.daily.precipitation_sum),
+      wind:pick(a.daily.wind_speed_10m_max),
+    };
+    // derive mean from max/min if the archive didn't supply it
+    if(last.mean==null && last.max!=null && last.min!=null) last.mean=(last.max+last.min)/2;
+    renderCells(last);
   }catch(e){
-    $("#yoy").innerHTML=`<div class="err">Historical archive for ${date} is unavailable right now.</div>`;
+    console.error("YoY archive failed:",e);
+    // Still show today's numbers instead of wiping the whole panel.
+    renderCells({max:null,min:null,mean:null,rain:null,wind:null},
+      `Last-year archive is temporarily unavailable — showing today's readings only.`);
   }
 }
 
