@@ -238,22 +238,95 @@
 <script>
 const CITIES = {
   Lahore: [
-    {n:"Gulberg", lat:31.5169, lon:74.3484},
-    {n:"DHA", lat:31.4704, lon:74.4029},
-    {n:"Model Town", lat:31.4847, lon:74.3260},
-    {n:"Johar Town", lat:31.4697, lon:74.2728},
-    {n:"Cantt", lat:31.5497, lon:74.3782},
-    {n:"Walled City", lat:31.5820, lon:74.3140},
-    {n:"Bahria Town", lat:31.3680, lon:74.1840},
+    // — Central —
+    {n:"Gulberg", g:"Lahore · Central", lat:31.5169, lon:74.3484},
+    {n:"Walled City (Androon)", g:"Lahore · Central", lat:31.5820, lon:74.3140},
+    {n:"Cantt", g:"Lahore · Central", lat:31.5497, lon:74.3782},
+    {n:"Samanabad", g:"Lahore · Central", lat:31.5400, lon:74.3000},
+    {n:"Garden Town", g:"Lahore · Central", lat:31.4980, lon:74.3220},
+    // — South —
+    {n:"DHA", g:"Lahore · South", lat:31.4704, lon:74.4029},
+    {n:"Model Town", g:"Lahore · South", lat:31.4847, lon:74.3260},
+    {n:"Johar Town", g:"Lahore · South", lat:31.4697, lon:74.2728},
+    {n:"Faisal Town", g:"Lahore · South", lat:31.4830, lon:74.3120},
+    {n:"Allama Iqbal Town", g:"Lahore · South", lat:31.5102, lon:74.2880},
+    {n:"Township", g:"Lahore · South", lat:31.4710, lon:74.3170},
+    {n:"Wapda Town", g:"Lahore · South", lat:31.4500, lon:74.2660},
+    {n:"Valencia", g:"Lahore · South", lat:31.4250, lon:74.2530},
+    {n:"Bahria Town", g:"Lahore · South", lat:31.3680, lon:74.1840},
+    // — North & East —
+    {n:"Shahdara", g:"Lahore · North & East", lat:31.6280, lon:74.2700},
+    {n:"Mughalpura", g:"Lahore · North & East", lat:31.5760, lon:74.3700},
+    {n:"Baghbanpura", g:"Lahore · North & East", lat:31.5930, lon:74.3560},
+    {n:"Harbanspura", g:"Lahore · North & East", lat:31.5840, lon:74.4080},
+    {n:"Batapur", g:"Lahore · North & East", lat:31.5860, lon:74.4400},
+    {n:"Jallo Mor", g:"Lahore · North & East", lat:31.5790, lon:74.4900},
+    // — Rural tehsils / outskirts —
+    {n:"Raiwind", g:"Lahore · Rural tehsils", lat:31.2480, lon:74.2070},
+    {n:"Manga Mandi", g:"Lahore · Rural tehsils", lat:31.2860, lon:74.1230},
+    {n:"Kahna Nau", g:"Lahore · Rural tehsils", lat:31.3760, lon:74.4170},
+    {n:"Barki", g:"Lahore · Rural tehsils", lat:31.4980, lon:74.5320},
+    {n:"Wagah", g:"Lahore · Rural tehsils", lat:31.6044, lon:74.5730},
+    {n:"Chung", g:"Lahore · Rural tehsils", lat:31.4300, lon:74.1700},
+    {n:"Sundar Estate", g:"Lahore · Rural tehsils", lat:31.3300, lon:74.1500},
+    // — Surrounding districts —
+    {n:"Sheikhupura", g:"Lahore · Surrounding districts", lat:31.7131, lon:73.9783},
+    {n:"Muridke", g:"Lahore · Surrounding districts", lat:31.8020, lon:74.2570},
+    {n:"Ferozewala", g:"Lahore · Surrounding districts", lat:31.6920, lon:74.1550},
+    {n:"Kala Shah Kaku", g:"Lahore · Surrounding districts", lat:31.7330, lon:74.2660},
+    {n:"Kasur", g:"Lahore · Surrounding districts", lat:31.1156, lon:74.4502},
+    {n:"Pattoki", g:"Lahore · Surrounding districts", lat:31.0210, lon:73.8520},
+    {n:"Chunian", g:"Lahore · Surrounding districts", lat:30.9640, lon:73.9790},
+    {n:"Nankana Sahib", g:"Lahore · Surrounding districts", lat:31.4520, lon:73.7060},
+    {n:"Kamoke", g:"Lahore · Surrounding districts", lat:31.9740, lon:74.2230},
   ],
   Karachi: [
-    {n:"Clifton", lat:24.8138, lon:67.0300},
-    {n:"DHA", lat:24.8000, lon:67.0650},
-    {n:"Saddar", lat:24.8607, lon:67.0099},
-    {n:"Gulshan-e-Iqbal", lat:24.9215, lon:67.0980},
-    {n:"North Nazimabad", lat:24.9460, lon:67.0388},
-    {n:"Korangi", lat:24.8390, lon:67.1350},
-    {n:"Malir", lat:24.8930, lon:67.2050},
+    // — District South —
+    {n:"Clifton", g:"Karachi · District South", lat:24.8138, lon:67.0300},
+    {n:"Saddar", g:"Karachi · District South", lat:24.8607, lon:67.0099},
+    {n:"DHA", g:"Karachi · District South", lat:24.8000, lon:67.0650},
+    {n:"Lyari", g:"Karachi · District South", lat:24.8770, lon:66.9960},
+    {n:"Kharadar", g:"Karachi · District South", lat:24.8480, lon:66.9930},
+    // — District East —
+    {n:"Gulshan-e-Iqbal", g:"Karachi · District East", lat:24.9215, lon:67.0980},
+    {n:"Gulistan-e-Johar", g:"Karachi · District East", lat:24.9200, lon:67.1300},
+    {n:"PECHS / Jamshed", g:"Karachi · District East", lat:24.8740, lon:67.0640},
+    {n:"Bahadurabad", g:"Karachi · District East", lat:24.8780, lon:67.0700},
+    {n:"Shah Faisal", g:"Karachi · District East", lat:24.8740, lon:67.1620},
+    // — District Central —
+    {n:"North Nazimabad", g:"Karachi · District Central", lat:24.9460, lon:67.0388},
+    {n:"Nazimabad", g:"Karachi · District Central", lat:24.9120, lon:67.0330},
+    {n:"Liaquatabad", g:"Karachi · District Central", lat:24.9050, lon:67.0420},
+    {n:"F.B. Area", g:"Karachi · District Central", lat:24.9300, lon:67.0700},
+    {n:"North Karachi", g:"Karachi · District Central", lat:24.9810, lon:67.0500},
+    {n:"New Karachi", g:"Karachi · District Central", lat:24.9930, lon:67.0620},
+    {n:"Buffer Zone", g:"Karachi · District Central", lat:24.9700, lon:67.0640},
+    // — District West & Keamari —
+    {n:"Orangi Town", g:"Karachi · West & Keamari", lat:24.9560, lon:66.9870},
+    {n:"SITE", g:"Karachi · West & Keamari", lat:24.8950, lon:66.9930},
+    {n:"Baldia", g:"Karachi · West & Keamari", lat:24.9000, lon:66.9300},
+    {n:"Manghopir", g:"Karachi · West & Keamari", lat:24.9970, lon:66.9230},
+    {n:"Keamari", g:"Karachi · West & Keamari", lat:24.8400, lon:66.9800},
+    {n:"Mauripur", g:"Karachi · West & Keamari", lat:24.8500, lon:66.9200},
+    {n:"Hawksbay", g:"Karachi · West & Keamari", lat:24.8600, lon:66.8200},
+    {n:"Manora", g:"Karachi · West & Keamari", lat:24.7950, lon:66.9780},
+    // — Korangi & Malir —
+    {n:"Korangi", g:"Karachi · Korangi & Malir", lat:24.8390, lon:67.1350},
+    {n:"Landhi", g:"Karachi · Korangi & Malir", lat:24.8490, lon:67.1900},
+    {n:"Shah Latif Town", g:"Karachi · Korangi & Malir", lat:24.8870, lon:67.2700},
+    {n:"Malir", g:"Karachi · Korangi & Malir", lat:24.8930, lon:67.2050},
+    {n:"Model Colony", g:"Karachi · Korangi & Malir", lat:24.8980, lon:67.1730},
+    {n:"Ibrahim Hyderi", g:"Karachi · Korangi & Malir", lat:24.8090, lon:67.1830},
+    {n:"Gulshan-e-Hadeed", g:"Karachi · Korangi & Malir", lat:24.8660, lon:67.3470},
+    {n:"Bin Qasim", g:"Karachi · Korangi & Malir", lat:24.7900, lon:67.3500},
+    // — Rural & surrounding —
+    {n:"Gadap Town", g:"Karachi · Rural & surrounding", lat:25.0700, lon:67.2300},
+    {n:"Gadap Rural", g:"Karachi · Rural & surrounding", lat:25.1500, lon:67.2500},
+    {n:"Memon Goth", g:"Karachi · Rural & surrounding", lat:24.9000, lon:67.3400},
+    {n:"Dhabeji", g:"Karachi · Rural & surrounding", lat:24.9700, lon:67.6500},
+    {n:"Gharo", g:"Karachi · Rural & surrounding", lat:24.7400, lon:67.5800},
+    {n:"Nooriabad", g:"Karachi · Rural & surrounding", lat:25.1600, lon:67.7400},
+    {n:"Hub", g:"Karachi · Rural & surrounding", lat:25.0700, lon:66.8900},
   ],
 };
 
@@ -318,8 +391,20 @@ function dayName(iso){return new Date(iso).toLocaleDateString("en-US",{weekday:"
 
 function buildAreas(){
   const sel = $("#area");
-  sel.innerHTML = CITIES[city].map((a,i)=>`<option value="${i}"${i===0?" selected":""}>${a.n}</option>`).join("");
-  area = CITIES[city][0];
+  const list = CITIES[city];
+  const order = [];           // group labels, in first-seen order
+  const byGroup = {};         // label -> [{a,i}]
+  list.forEach((a,i)=>{
+    const g = a.g || city;
+    if(!byGroup[g]){ byGroup[g] = []; order.push(g); }
+    byGroup[g].push({a,i});
+  });
+  sel.innerHTML = order.map(g =>
+    `<optgroup label="${g}">` +
+    byGroup[g].map(({a,i})=>`<option value="${i}"${i===0?" selected":""}>${a.n}</option>`).join("") +
+    `</optgroup>`
+  ).join("");
+  area = list[0];
 }
 
 async function getJSON(url){
